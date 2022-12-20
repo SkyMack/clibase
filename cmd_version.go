@@ -42,11 +42,7 @@ func version(name string, flags *pflag.FlagSet) error {
 		}
 		output := fmt.Sprintf("%s %s", pkg.Path, pkg.Version)
 		if pkg.Replace != nil {
-			var struckthrough string
-			for _, r := range output {
-				struckthrough += "\u0336" + string(r)
-			}
-			output = fmt.Sprintf("%s\u0336  => %s", struckthrough, pkg.Replace.Path)
+			output = fmt.Sprintf("%s => %s", output, pkg.Replace.Path)
 		}
 		fmt.Printf("  %s\n", output)
 	}
