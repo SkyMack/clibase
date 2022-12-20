@@ -145,7 +145,7 @@ func SetFlagsFromEnvWithOverrides(prefix string, flagSet *pflag.FlagSet, overrid
 	})
 }
 
-// SetFlagsFromEnv calls SetFlagsFromEnvWithOverrides and passes an empty overrides
+// SetFlagsFromEnv calls SetFlagsFromEnvWithOverrides and passes an empty overrides map
 func SetFlagsFromEnv(prefix string, flags *pflag.FlagSet) {
 	SetFlagsFromEnvWithOverrides(prefix, flags, map[string]string{})
 }
