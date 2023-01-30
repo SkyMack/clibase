@@ -9,7 +9,7 @@ Clibase provides the basic features and functionality common to all of my Cobra 
 * A `version` subcommand that will print out all the imported packages, including overrides specified in `go.mod` (at the time of compilation)
 * Logrus configuration and top level logging related flags (like `log-format` and `log-level`)
 
-# Install
+# Installation
 ```bash
 go get -u github.com/SkyMack/clibase
 ```
