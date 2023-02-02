@@ -44,7 +44,6 @@ func NewUsingCmd(rootCmd *cobra.Command) *cobra.Command {
 		oldPersistPreRunE := rootCmd.PersistentPreRunE
 		rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 			if err := oldPersistPreRunE(cmd, args); err != nil {
-				// Logging shit
 				return err
 			}
 			return rootPersistentPreRunE(cmd, args)
