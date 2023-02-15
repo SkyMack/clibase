@@ -41,12 +41,12 @@ func New(cmdName, cmdDescription string) *cobra.Command {
 func NewUsingCmd(rootCmd *cobra.Command) *cobra.Command {
 	var persistentPreRunE func(*cobra.Command, []string) error
 	if rootCmd.PersistentPreRunE != nil {
-		oldPersistPreRunE := rootCmd.PersistentPreRunE
-		rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-			if err := oldPersistPreRunE(cmd, args); err != nil {
+		existingPersistentPreRunE := rootCmd.PersistentPreRunE
+		persistentPreRunE = func(cmd *cobra.Command, args []string) error {
+			if err := rootPersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
-			return rootPersistentPreRunE(cmd, args)
+			return existingPersistentPreRunE(cmd, args)
 		}
 	} else {
 		persistentPreRunE = rootPersistentPreRunE
