@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/writer"
@@ -32,32 +33,41 @@ var (
 	ErrorLogLevelParse = fmt.Errorf("unable to parse specified log level")
 	// ErrorLogUnknownFormat is the error logged when an unrecognized log format is specified
 	ErrorLogUnknownFormat = fmt.Errorf("unknown log format specified")
+
+	once                 sync.Once
+	onceLoggingBootstrap = func() {
+		// Set the initial logger configuration (used for any messages logged before flags can change the config)
+		if err := configureLogging(getLogSettings()); err != nil {
+			log.Error(ErrorLogInitFailure.Error())
+		}
+
+		log.SetOutput(io.Discard) // Send all logs to nowhere by default
+		log.AddHook(&writer.Hook{ // Send logs with level higher than warning to stderr
+			Writer: os.Stderr,
+			LogLevels: []log.Level{
+				log.PanicLevel,
+				log.FatalLevel,
+				log.ErrorLevel,
+				log.WarnLevel,
+			},
+		})
+		log.AddHook(&writer.Hook{ // Send info, debug, and trace logs to stdout
+			Writer: os.Stdout,
+			LogLevels: []log.Level{
+				log.InfoLevel,
+				log.DebugLevel,
+				log.TraceLevel,
+			},
+		})
+	}
 )
 
 func init() {
-	// Set the initial logger configuration (used for any messages logged before flags can change the config)
-	if err := configureLogging(getLogSettings()); err != nil {
-		log.Error(ErrorLogInitFailure.Error())
-	}
+	InitLogging()
+}
 
-	log.SetOutput(io.Discard) // Send all logs to nowhere by default
-	log.AddHook(&writer.Hook{ // Send logs with level higher than warning to stderr
-		Writer: os.Stderr,
-		LogLevels: []log.Level{
-			log.PanicLevel,
-			log.FatalLevel,
-			log.ErrorLevel,
-			log.WarnLevel,
-		},
-	})
-	log.AddHook(&writer.Hook{ // Send info, debug, and trace logs to stdout
-		Writer: os.Stdout,
-		LogLevels: []log.Level{
-			log.InfoLevel,
-			log.DebugLevel,
-			log.TraceLevel,
-		},
-	})
+func InitLogging() {
+	once.Do(onceLoggingBootstrap)
 }
 
 func addLogFlags(flags *pflag.FlagSet) {
